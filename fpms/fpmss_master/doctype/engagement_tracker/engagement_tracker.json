@@ -43,8 +43,8 @@
   "articles_in_newspapers_magazines_and_other_publications",
   "podcast_webinar_radio_tv_video_episode_exhibition_etc",
   "translation",
-  "review_of_books_film_etc",
   "peer_review_of_journal_articles",
+  "review_of_books_film_etc",
   "conference_workshop_organising",
   "other_publications_or_research_related_work",
   "ongoing_research_projects",
@@ -171,6 +171,12 @@
    "fieldtype": "Table",
    "label": "Credited courses ",
    "options": "Course Details Child"
+  },
+  {
+   "fieldname": "mentoring",
+   "fieldtype": "Table",
+   "label": "Mentoring Details",
+   "options": "Mentoring Details Child"
   },
   {
    "fieldname": "designing_teaching_programs_or_courses",
@@ -439,12 +445,6 @@
    "label": "Other Reflectioan "
   },
   {
-   "fieldname": "mentoring",
-   "fieldtype": "Table",
-   "label": "Mentoring Details",
-   "options": "Mentoring Details Child"
-  },
-  {
    "default": "Save",
    "fieldname": "engagement_tracker_status",
    "fieldtype": "Select",
@@ -467,7 +467,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-19 19:00:46.673074",
+ "modified": "2025-11-20 16:13:43.549066",
  "modified_by": "Administrator",
  "module": "FPMSS Master",
  "name": "Engagement Tracker",
@@ -484,6 +484,13 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Faculty",
    "submit": 1,
    "write": 1
   }

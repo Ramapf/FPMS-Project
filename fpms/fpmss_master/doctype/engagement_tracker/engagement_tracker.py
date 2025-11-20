@@ -26,22 +26,28 @@ def send_submission_email(docname):
     # Year
     year = doc.academic_year or "2025-2026"
 
-    subject = "FPMS Engagement Tracker Submission Confirmation"
+    subject = "Final submission of Self Assessment"
 
+    # ----------------------
+    # UPDATED EMAIL CONTENT
+    # ----------------------
     message = f"""
 <p>Dear {first_name},</p>
 
-<p>Your FPMS Engagement Tracker for the Year <b>{year}</b> has been saved successfully.</p>
+<p>Your FPMS form for the Year <b>{year}</b> has been submitted.</p>
 
-<p>You can view the form using the link below:</p>
+<p>You can download the Self Assessment document from the link below:</p>
 <p><a href="{link}" target="_blank">{link}</a></p>
 
 <p><i>(Please do not respond to this automatic notification)</i></p>
+
+<p>In case of any query please write to <b>fpmssupport@apu.edu.in</b>.</p>
 
 <p>Regards,<br>
 <b>People Function</b></p>
 """
 
+    # Send Email
     frappe.sendmail(
         recipients=[doc.email],
         subject=subject,

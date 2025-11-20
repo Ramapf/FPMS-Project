@@ -220,7 +220,7 @@ frappe.ui.form.on('Engagement Tracker', {
 
 
 
-        //--------------------------------------------------
+        //-------------------------------------------------- 
         // FIRST TIME OPEN → SET DEFAULT STATUS
         //--------------------------------------------------
         if (!frm.doc.engagement_tracker_status) {

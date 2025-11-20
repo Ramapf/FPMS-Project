@@ -40,13 +40,13 @@ def send_announcement_email(doc):
     subject = "Creation of FPMS Form"
     year = doc.academic_year or "2025-2026"
 
+    # Base URL (works for BOTH local & cloud)
     base_url = frappe.utils.get_url()
 
-    # Engagement Tracker link with correct parameters
+    # Link passed to faculty for opening Engagement Tracker
     tracker_url = (
-        f"{base_url}/app/engagement-tracker/new-engagement-tracker"
-        f"?academic_year={doc.academic_year}"
-        f"&announcement={doc.announcement_id}"
+        f"{base_url}/app/engagement-tracker/new-engagement-tracker?"
+        f"academic_year={doc.academic_year}&announcement={doc.announcement_id}"
     )
 
     # ----------------------------------------
@@ -77,7 +77,7 @@ def send_announcement_email(doc):
 </p>
 
 <p>
-    Please use the link below to navigate to the document and to start
+    Please use the link below to navigate to the document and start
     setting your Objectives and Engagement details:
 </p>
 
@@ -96,8 +96,8 @@ def send_announcement_email(doc):
 </p>
 
 <p>
-    In case of any query please write to
-    <a href="mailto:fpmssupport@apu.edu.in">fpmssupport@apu.edu.in</a>
+    In case of any query, please write to
+    <a href="mailto:fpmssupport@apu.edu.in">fpmssupport@apu.edu.in</a>.
 </p>
 
 <p><i>(Please do not respond to this automatic notification)</i></p>
@@ -116,18 +116,17 @@ def send_announcement_email(doc):
 
 
 # ------------------------------------------------------------
-# ⭐ AUTO-FILL ENGAGEMENT TRACKER (SERVER SIDE)
+# ⭐ AUTO-FILL ENGAGEMENT TRACKER API (SERVER SIDE)
 # ------------------------------------------------------------
 @frappe.whitelist()
 def apply_tracker_defaults(announcement=None, academic_year=None):
     """
     API auto-fills announcement + academic_year inside Engagement Tracker.
-    Triggered automatically when the form is opened using URL parameters.
+    Triggered when form is opened using URL parameters.
+    WORKS IN LOCAL + FRAPPE CLOUD.
     """
 
-    data = {
+    return {
         "announcement": announcement,
         "academic_year": academic_year
     }
-
-    return data
