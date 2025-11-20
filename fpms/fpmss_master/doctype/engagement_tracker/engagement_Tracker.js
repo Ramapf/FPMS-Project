@@ -1,71 +1,70 @@
-frappe.ui.form.on("Engagement Tracker", {
-
+    frappe.ui.form.on("Engagement Tracker", {
     refresh(frm) {
 
-        // Hide print before submit
+        // Hide print in draft mode
         if (frm.doc.engagement_tracker_status !== "Submit") {
             $('.page-actions .btn[data-original-title="Print"]').hide();
         }
 
-        // If submitted → lock form
+        // When form is already submitted → Lock fields
         if (frm.doc.engagement_tracker_status === "Submit") {
 
             frm.disable_form();
             $('.page-actions .btn[data-original-title="Print"]').show();
 
-            // Let supervisor re-enable editing
+            // Supervisor "Enable Edit"
             if ($('.custom-edit-btn').length === 0 && frappe.user.has_role("Supervisor")) {
-
                 let btn = $('<button class="btn btn-danger btn-sm custom-edit-btn ml-2">Enable to Edit</button>');
-
                 btn.on("click", function () {
                     frm.enable_form();
                     frm.set_value("engagement_tracker_status", "Save");
                     frm.save();
                 });
-
                 $(".page-actions").append(btn);
             }
-
-            return;
         }
 
-        // --------------------
-        // Custom Submit Button
-        // --------------------
-        setTimeout(() => {
+        // Draft Mode → Add Custom Submit Button
+        if (frm.doc.engagement_tracker_status === "Save") {
+            setTimeout(() => {
 
-            const saveBtn = $('button[data-label="Save"]');
-            saveBtn.text("Save as Draft");
+                const saveBtn = $('button[data-label="Save"]');
+                saveBtn.text("Save as Draft");
 
-            if (!$('.custom-submit-btn').length) {
+                // Add SUBMIT BUTTON
+                if (!$('.custom-submit-btn').length) {
+                    let submitBtn = $('<button class="btn btn-primary btn-sm custom-submit-btn ml-2">Submit</button>');
+                    submitBtn.on("click", function () {
 
-                let submitBtn = $('<button class="btn btn-primary btn-sm custom-submit-btn ml-2">Submit</button>');
+                        if (!frm.doc.email) {
+                            frappe.msgprint("Email is missing. Please fill Email before submitting.");
+                            return;
+                        }
 
-                submitBtn.on("click", function () {
+                        frm.set_value("engagement_tracker_status", "Submit");
 
-                    // ❌ EMAIL EMPTY → BLOCK SUBMISSION
-                    if (!frm.doc.email) {
-                        frappe.throw("Email is required before submitting the form.");
-                    }
-
-                    frm.set_value("engagement_tracker_status", "Submit");
-
-                    frm.save().then(() => {
-
-                        // 🔥 This triggers backend on_submit()
-                        frm.submit();
-
-                        frappe.msgprint("🎉 Successfully Submitted! Email will be sent shortly.");
+                        frm.save().then(() => {
+                            // Call server email function
+                            frappe.call({
+                                method: "fpms.fpms.doctype.engagement_tracker.engagement_tracker.send_submission_email",
+                                args: {
+                                    docname: frm.doc.name
+                                },
+                                callback() {
+                                    frappe.msgprint("🎉 Successfully Submitted! Email Sent.");
+                                    frm.reload_doc();
+                                }
+                            });
+                        });
                     });
-                });
 
-                saveBtn.after(submitBtn);
-            }
+                    saveBtn.after(submitBtn);
+                }
 
-        }, 200);
+            }, 200);
+        }
 
-        // First time default
+        // First time entry
         if (!frm.doc.engagement_tracker_status) {
             frm.set_value("engagement_tracker_status", "Save");
         }
