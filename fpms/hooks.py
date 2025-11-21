@@ -4,6 +4,7 @@ app_publisher = "Ram"
 app_description = "Faculty Performance Management System project"
 app_email = "mahaveer.p@azimpremjifoundation.org"
 app_license = "mit"
+# override_home_page = "fpms.Facultylogin_api.get_home_page"
 
 # Doctype JS
 doctype_js = {
@@ -22,6 +23,12 @@ doc_events = {
         "on_submit": "fpms.fpms.doctype.announcement.announcement.send_announcement_email"
     }
 }
+
+# # ⭐ ADD THIS (DO NOT TOUCH ANY OTHER CODE)
+# override_whitelisted_methods = {
+#     "frappe.desk.desktop.get_desktop_page": "fpms.Facultylogin_api.redirect_faculty"
+# }
+
 
 # -------------------------
 # The rest is default Frappe commented sections.

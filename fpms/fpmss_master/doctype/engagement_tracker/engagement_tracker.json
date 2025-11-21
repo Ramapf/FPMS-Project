@@ -69,8 +69,7 @@
   "test",
   "test2",
   "test3",
-  "test4",
-  "amended_from"
+  "test4"
  ],
  "fields": [
   {
@@ -451,22 +450,12 @@
    "label": "Engagement Tracker status",
    "options": "Save\nSubmit\nEnable to Edit",
    "read_only_depends_on": "1"
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Engagement Tracker",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-20 18:45:54.966559",
+ "modified": "2025-11-21 14:40:00.857463",
  "modified_by": "Administrator",
  "module": "FPMSS Master",
  "name": "Engagement Tracker",
