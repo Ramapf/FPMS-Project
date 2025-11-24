@@ -447,6 +447,7 @@
    "default": "Save",
    "fieldname": "engagement_tracker_status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Engagement Tracker status",
    "options": "Save\nSubmit\nEnable to Edit",
    "read_only_depends_on": "1"
@@ -455,7 +456,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-21 14:40:00.857463",
+ "modified": "2025-11-24 12:41:51.693202",
  "modified_by": "Administrator",
  "module": "FPMSS Master",
  "name": "Engagement Tracker",
