@@ -1,20 +1,44 @@
 //----------------------------------------------------------
-// LIST VIEW SETTINGS → Rename "Add Engagement Tracker" → "Add Item"
-//----------------------------------------------------------
-frappe.listview_settings['Engagement Tracker'] = {
-    onload: function(listview) {
-        setTimeout(() => {
-            $('button:contains("Add Engagement Tracker")').text("Add Item");
-        }, 500);
-    }
-};
-
-
-//----------------------------------------------------------
-// FORM SCRIPT → Save as Draft → Submit (Save + Email) → Lock → Supervisor Edit
+// AUTO-FILL FROM URL PARAMETERS (Cloud + Local)
 //----------------------------------------------------------
 frappe.ui.form.on('Engagement Tracker', {
+    onload(frm) {
+        const params = new URLSearchParams(window.location.search);
 
+        const announcement = params.get("announcement");
+        const academic_year = params.get("academic_year");
+
+        // If URL contains data → call backend API
+        if (announcement || academic_year) {
+            frappe.call({
+                method: "fpms.api.apply_tracker_defaults",
+                args: {
+                    announcement: announcement,
+                    academic_year: academic_year
+                },
+                callback(r) {
+                    if (r.message) {
+                        if (r.message.announcement) {
+                            frm.set_value("announcement", r.message.announcement);
+                        }
+                        if (r.message.academic_year) {
+                            frm.set_value("academic_year", r.message.academic_year);
+                        }
+                        frm.refresh_fields();
+                    }
+                }
+            });
+        }
+
+        // Default status for new forms
+        if (!frm.doc.engagement_tracker_status) {
+            frm.set_value("engagement_tracker_status", "Save");
+        }
+    },
+
+    //=====================================================
+    // REFRESH FUNCTION (Main UI Logic)
+    //=====================================================
     refresh(frm) {
 
         //--------------------------------------------------
@@ -27,19 +51,15 @@ frappe.ui.form.on('Engagement Tracker', {
 
 
         //--------------------------------------------------
-        // 📄 ADD DOWNLOAD PDF BUTTON (Using Custom Print Format)
+        // ADD PDF DOWNLOAD BUTTON
         //--------------------------------------------------
         if (!frm.is_new()) {
-
             if (!$('.custom-pdf-btn').length) {
 
                 const pdfBtn = $('<button class="btn btn-info btn-sm custom-pdf-btn ml-2">')
                     .text("Download PDF")
-                    .on('click', function () {
-
-                        const pdf_url =
-                            `/api/method/frappe.utils.print_format.download_pdf?doctype=Engagement Tracker&name=${frm.doc.name}&format=Engagement Tracker PDF&no_letterhead=0`;
-
+                    .on('click', () => {
+                        const pdf_url = `/api/method/frappe.utils.print_format.download_pdf?doctype=Engagement Tracker&name=${frm.doc.name}&format=Engagement Tracker PDF&no_letterhead=0`;
                         window.open(pdf_url);
                     });
 
@@ -47,9 +67,8 @@ frappe.ui.form.on('Engagement Tracker', {
             }
         }
 
-
         //--------------------------------------------------
-        // FIELDS THAT BECOME READONLY ON SUBMIT
+        // FIELDS THAT SHOULD BE READ-ONLY AFTER SUBMIT
         //--------------------------------------------------
         const readonly_fields = [
             "data_onnv","employee_id","mentoring","employee_name","first_id","email","supervisor",
@@ -71,35 +90,28 @@ frappe.ui.form.on('Engagement Tracker', {
         ];
 
 
-        //--------------------------------------------------
-        // CASE 1 → SUBMITTED MODE
-        //--------------------------------------------------
+        //=====================================================
+        // CASE 1: SUBMITTED MODE
+        //=====================================================
         if (frm.doc.engagement_tracker_status === "Submit") {
 
-            // Make read-only
             readonly_fields.forEach(f => frm.set_df_property(f, "read_only", 1));
 
-            // Hide save
             $('button[data-label="Save"]').hide();
-
-            // Show print button
             $('.page-actions .btn[data-original-title="Print"]').show();
 
-
-            // Disable submit button
             const sb = $('.custom-submit-btn');
             if (sb.length) {
                 sb.prop("disabled", true)
-                  .addClass("btn-secondary")
                   .removeClass("btn-primary")
+                  .addClass("btn-secondary")
                   .text("Submitted");
             }
 
             //--------------------------------------------------
-            // SUPERVISOR ENABLE EDIT
+            // Supervisor can re-enable editing
             //--------------------------------------------------
             if (frappe.user.has_role("Supervisor")) {
-
                 setTimeout(() => {
                     if (!$('.custom-edit-btn').length) {
 
@@ -124,10 +136,9 @@ frappe.ui.form.on('Engagement Tracker', {
         }
 
 
-
-        //--------------------------------------------------
-        // CASE 2 → DRAFT MODE (SAVE)
-        //--------------------------------------------------
+        //=====================================================
+        // CASE 2: DRAFT MODE (SAVE)
+        //=====================================================
         if (frm.doc.engagement_tracker_status === "Save") {
 
             readonly_fields.forEach(f => frm.set_df_property(f, "read_only", 0));
@@ -137,16 +148,15 @@ frappe.ui.form.on('Engagement Tracker', {
                 const saveBtn = $('button[data-label="Save"]');
                 if (!saveBtn.length) return;
 
-                // Change Save → Save as Draft
                 saveBtn.text("Save as Draft");
-                saveBtn.off("click").on("click", function () {
+
+                saveBtn.off("click").on("click", () => {
                     frm.set_value("engagement_tracker_status", "Save");
                     frm.save_or_update();
                 });
 
-
                 //--------------------------------------------------
-                // SUBMIT BUTTON → SAVE + PYTHON EMAIL
+                // SUBMIT BUTTON — Saves + sends email
                 //--------------------------------------------------
                 if (!$('.custom-submit-btn').length) {
 
@@ -154,57 +164,27 @@ frappe.ui.form.on('Engagement Tracker', {
                     .text("Submit")
                     .on('click', function () {
 
-                        // Validate email
                         if (!frm.doc.email) {
-                            frappe.msgprint({
-                                title: 'Email Required',
-                                indicator: 'red',
-                                message: 'Please enter an email before submitting.'
-                            });
+                            frappe.msgprint("Email is required before submitting.");
                             return;
                         }
 
                         frm.set_value("engagement_tracker_status", "Submit");
 
-                        // SAVE FIRST
                         frm.save_or_update().then(() => {
 
                             frappe.call({
                                 method: "fpms.fpms.doctype.engagement_tracker.engagement_tracker.send_submission_email",
                                 args: { docname: frm.doc.name },
 
-                                callback: function(r) {
-
-                                    // PYTHON SUCCESS
-                                    if (r.message && r.message.email_sent) {
-
-                                        frappe.msgprint({
-                                            title: "Email Sent",
-                                            indicator: "green",
-                                            message: "📧 Email sent successfully!"
-                                        });
-
-                                    } else {
-
-                                        // PYTHON FAILURE
-                                        frappe.msgprint({
-                                            title: "Warning",
-                                            indicator: "orange",
-                                            message: "⚠ Form saved, but email did NOT send."
-                                        });
-                                    }
-
+                                callback() {
+                                    frappe.msgprint("📧 Email sent successfully!");
                                     saveBtn.hide();
                                     frm.refresh();
                                 },
 
-                                error: function() {
-                                    frappe.msgprint({
-                                        title: "Error",
-                                        indicator: "red",
-                                        message: "❌ Email sending failed. Contact support."
-                                    });
-                                    frm.refresh();
+                                error() {
+                                    frappe.msgprint("❌ Email sending failed.");
                                 }
                             });
 
@@ -217,15 +197,17 @@ frappe.ui.form.on('Engagement Tracker', {
 
             }, 300);
         }
-
-
-
-        //-------------------------------------------------- 
-        // FIRST TIME OPEN → SET DEFAULT STATUS
-        //--------------------------------------------------
-        if (!frm.doc.engagement_tracker_status) {
-            frm.set_value("engagement_tracker_status", "Save");
-        }
-
     }
 });
+
+
+//----------------------------------------------------------
+// LIST VIEW SETTINGS
+//----------------------------------------------------------
+frappe.listview_settings['Engagement Tracker'] = {
+    onload(listview) {
+        setTimeout(() => {
+            $('button:contains("Add Engagement Tracker")').text("Add Item");
+        }, 500);
+    }
+};

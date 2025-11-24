@@ -23,6 +23,10 @@ doc_events = {
         "on_submit": "fpms.fpms.doctype.announcement.announcement.send_announcement_email"
     }
 }
+doctype_js = {
+    "Engagement Tracker": "public/js/engagement_tracker.js"
+}
+
 
 # # ⭐ ADD THIS (DO NOT TOUCH ANY OTHER CODE)
 # override_whitelisted_methods = {
