@@ -1,7 +1,15 @@
+// Copyright (c) 2025, Ram and contributors
+// For license information, please see license.txt
+
+// frappe.ui.form.on("Engagement", {
+// 	refresh(frm) {
+
+// 	},
+// });
 //----------------------------------------------------------
 // AUTO-FILL FROM URL PARAMETERS (Cloud + Local)
 //----------------------------------------------------------
-frappe.ui.form.on('Engagement Tracker', {
+frappe.ui.form.on('Engagement', {
     onload(frm) {
         const params = new URLSearchParams(window.location.search);
 
@@ -59,7 +67,9 @@ frappe.ui.form.on('Engagement Tracker', {
                 const pdfBtn = $('<button class="btn btn-info btn-sm custom-pdf-btn ml-2">')
                     .text("Download PDF")
                     .on('click', () => {
-                        const pdf_url = `/api/method/frappe.utils.print_format.download_pdf?doctype=Engagement Tracker&name=${frm.doc.name}&format=Engagement Tracker PDF&no_letterhead=0`;
+                        const pdf_url =
+                            `/api/method/frappe.utils.print_format.download_pdf?doctype=Engagement&name=${frm.doc.name}&format=Engagement PDF&no_letterhead=0`;
+
                         window.open(pdf_url);
                     });
 
@@ -156,7 +166,7 @@ frappe.ui.form.on('Engagement Tracker', {
                 });
 
                 //--------------------------------------------------
-                // SUBMIT BUTTON — Saves + sends email
+                // SUBMIT BUTTON — Sends Email + Locks Form
                 //--------------------------------------------------
                 if (!$('.custom-submit-btn').length) {
 
@@ -174,7 +184,7 @@ frappe.ui.form.on('Engagement Tracker', {
                         frm.save_or_update().then(() => {
 
                             frappe.call({
-                                method: "fpms.fpms.doctype.engagement_tracker.engagement_tracker.send_submission_email",
+                                method: "fpms.fpms.doctype.engagement.engagement.send_submission_email",
                                 args: { docname: frm.doc.name },
 
                                 callback() {
@@ -204,10 +214,10 @@ frappe.ui.form.on('Engagement Tracker', {
 //----------------------------------------------------------
 // LIST VIEW SETTINGS
 //----------------------------------------------------------
-frappe.listview_settings['Engagement Tracker'] = {
+frappe.listview_settings['Engagement'] = {
     onload(listview) {
         setTimeout(() => {
-            $('button:contains("Add Engagement Tracker")').text("Add Item");
+            $('button:contains("Add Engagement")').text("Add Item");
         }, 500);
     }
 };

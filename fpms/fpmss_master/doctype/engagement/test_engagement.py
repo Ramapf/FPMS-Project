@@ -13,9 +13,9 @@ IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
 
-class IntegrationTestEngagementTracker(IntegrationTestCase):
+class IntegrationTestEngagement(IntegrationTestCase):
 	"""
-	Integration tests for EngagementTracker.
+	Integration tests for Engagement.
 	Use this class for testing interactions between multiple components.
 	"""
 

@@ -1,7 +1,8 @@
 {
  "actions": [],
- "autoname": "autoincrement",
- "creation": "2025-10-27 16:03:48.878720",
+ "allow_import": 1,
+ "autoname": "ET.####",
+ "creation": "2025-12-12 11:21:57.948259",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -11,23 +12,24 @@
   "email",
   "supervisor",
   "supervisor_mail",
-  "column_break_xhqd",
+  "column_break_luoe",
   "announcement",
   "academic_year",
   "school_details",
   "campus",
   "engagement_tracker_status",
-  "objectives_section",
-  "data_onnv",
+  "h3objectivesh3_section",
+  "objectives",
   "feedback_if_any",
   "teaching_mentoring",
-  "description_to_be_added",
+  "teaching_descr",
   "course_details",
-  "mentoring",
+  "mentoring_details",
   "designing_teaching_programs_or_courses",
   "workshops_for_university_students",
   "research_writing",
-  "text_tlvs",
+  "research_descr",
+  "contribution_details",
   "article_in_peer_reviewed_journal",
   "article_in_nonreviewed_journal_or_conference_proceedings",
   "discussion_paper_or_working_paper",
@@ -43,15 +45,15 @@
   "articles_in_newspapers_magazines_and_other_publications",
   "podcast_webinar_radio_tv_video_episode_exhibition_etc",
   "translation",
-  "peer_review_of_journal_articles",
   "review_of_books_film_etc",
+  "peer_review_of_journal_articles",
   "conference_workshop_organising",
   "other_publications_or_research_related_work",
   "ongoing_research_projects",
   "practice_engagement",
   "practice_descr",
   "practice_public",
-  "professional_development_programs",
+  "pdp_school",
   "public_talks_webinars_guest_lectures_etc",
   "contribution_to_social_sector_initiatives",
   "contribution_to_government_related_initiatives",
@@ -59,12 +61,12 @@
   "contribution_at_other_academic_institutions",
   "consulting",
   "other",
-  "institution_building_section",
+  "institution_building",
   "institution_descr",
   "institution_details",
   "roles_and_committees",
-  "contributing_to_organising_conferences_ev",
-  "reflection_sectiontext",
+  "volunteering_for_organising_conferences",
+  "reflection_section",
   "test1",
   "test",
   "test2",
@@ -74,63 +76,83 @@
  "fields": [
   {
    "fieldname": "employee_id",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Employee Name",
    "options": "Employee Details"
   },
   {
    "fetch_from": "employee_id.employee_name",
+   "fetch_if_empty": 1,
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "hidden": 1,
-   "label": "Name"
+   "label": "Name ",
+   "read_only": 1
   },
   {
    "fetch_from": "employee_id.first_id",
+   "fetch_if_empty": 1,
    "fieldname": "first_id",
    "fieldtype": "Data",
-   "label": "Employee ID"
+   "in_list_view": 1,
+   "label": "Employee ID",
+   "read_only": 1
   },
   {
    "fetch_from": "employee_id.email",
+   "fetch_if_empty": 1,
    "fieldname": "email",
    "fieldtype": "Data",
-   "label": "Email"
+   "label": "Email",
+   "options": "Email",
+   "read_only": 1
   },
   {
-   "fetch_from": "employee_id.supervisor",
+   "fetch_from": "employee_id.supervisor_name",
+   "fetch_if_empty": 1,
    "fieldname": "supervisor",
    "fieldtype": "Data",
-   "label": "Supervisor Name"
+   "label": "Supervisor",
+   "read_only": 1
   },
   {
    "fetch_from": "employee_id.supervisor_email",
+   "fetch_if_empty": 1,
    "fieldname": "supervisor_mail",
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Supervisor Email"
   },
   {
-   "fieldname": "column_break_xhqd",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "announcement",
    "fieldtype": "Data",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Announcement",
    "options": "Announcement"
   },
   {
    "fetch_from": "announcement.academic_year",
+   "fetch_if_empty": 1,
    "fieldname": "academic_year",
    "fieldtype": "Data",
-   "label": "Academic Year"
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Academic Year",
+   "read_only": 1
   },
   {
    "fetch_from": "employee_id.school_details",
+   "fetch_if_empty": 1,
    "fieldname": "school_details",
    "fieldtype": "Data",
-   "label": "School/Function/Program"
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "School/Function/Program",
+   "options": "School Details",
+   "read_only": 1
   },
   {
    "fetch_from": "employee_id.campus",
@@ -139,26 +161,12 @@
    "label": "Campus"
   },
   {
-   "fieldname": "objectives_section",
-   "fieldtype": "Section Break",
-   "label": "<h3>Objectives</h3>"
-  },
-  {
-   "fieldname": "data_onnv",
-   "fieldtype": "Table",
-   "options": "Objectives"
-  },
-  {
-   "bold": 1,
-   "fieldname": "feedback_if_any",
-   "fieldtype": "Text",
-   "label": "Feedback (if any)"
-  },
-  {
-   "fieldname": "description_to_be_added",
-   "fieldtype": "Text",
+   "default": "Save",
+   "fieldname": "engagement_tracker_status",
+   "fieldtype": "Select",
    "hidden": 1,
-   "label": "Description to be added"
+   "label": "Engagement Tracker status",
+   "options": "Save\nSubmit\nEnable to Edit"
   },
   {
    "fieldname": "teaching_mentoring",
@@ -170,12 +178,6 @@
    "fieldtype": "Table",
    "label": "Credited courses ",
    "options": "Course Details Child"
-  },
-  {
-   "fieldname": "mentoring",
-   "fieldtype": "Table",
-   "label": "Mentoring Details",
-   "options": "Mentoring Details Child"
   },
   {
    "fieldname": "designing_teaching_programs_or_courses",
@@ -192,12 +194,7 @@
   {
    "fieldname": "research_writing",
    "fieldtype": "Section Break",
-   "label": "<h3>Research-Writing</h3>"
-  },
-  {
-   "fieldname": "text_tlvs",
-   "fieldtype": "Text",
-   "hidden": 1
+   "label": "Research-Writing"
   },
   {
    "fieldname": "article_in_peer_reviewed_journal",
@@ -220,7 +217,7 @@
   {
    "fieldname": "book",
    "fieldtype": "Table",
-   "label": "Book",
+   "label": "Book ",
    "options": "Book"
   },
   {
@@ -298,13 +295,13 @@
   {
    "fieldname": "review_of_books_film_etc",
    "fieldtype": "Table",
-   "label": "Review of books film etc",
+   "label": "Peer review of journal articles",
    "options": "Review of books film etc"
   },
   {
    "fieldname": "conference_workshop_organising",
    "fieldtype": "Table",
-   "label": "Organising Conference/ Workshop ",
+   "label": " Organising Conference/ Workshop ",
    "options": "Conference Workshop organising"
   },
   {
@@ -322,25 +319,20 @@
   {
    "fieldname": "practice_engagement",
    "fieldtype": "Section Break",
-   "label": "<h3>Practice-Public Engagement</h3><h3></h3>"
+   "label": "Practice-Public Engagement"
   },
   {
    "fieldname": "practice_descr",
-   "fieldtype": "Text",
+   "fieldtype": "Small Text",
    "hidden": 1,
    "label": "Description to be added"
   },
   {
    "fieldname": "practice_public",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Practice Public",
    "options": "Practice Public Engagement Details Child"
-  },
-  {
-   "fieldname": "professional_development_programs",
-   "fieldtype": "Table",
-   "label": "Professional Development Programs",
-   "options": "Professional Development Programs"
   },
   {
    "fieldname": "public_talks_webinars_guest_lectures_etc",
@@ -357,7 +349,7 @@
   {
    "fieldname": "contribution_to_government_related_initiatives",
    "fieldtype": "Table",
-   "label": "Contribution to government related initiatives",
+   "label": "Contribution to government related initiatives (beyond PDPs and workshops)",
    "options": "Contribution to government related initiatives"
   },
   {
@@ -385,19 +377,15 @@
    "options": "Other"
   },
   {
-   "fieldname": "institution_building_section",
-   "fieldtype": "Section Break",
-   "label": "<h3>Institution Building</h3><h3></h3>"
-  },
-  {
    "fieldname": "institution_descr",
-   "fieldtype": "Long Text",
+   "fieldtype": "Small Text",
    "hidden": 1,
    "label": "Description to be added"
   },
   {
    "fieldname": "institution_details",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Institution Building Details",
    "options": "Institution Building Details Child"
   },
@@ -408,25 +396,65 @@
    "options": "Institutional Roles and Committees"
   },
   {
-   "fieldname": "contributing_to_organising_conferences_ev",
+   "fieldname": "column_break_luoe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "teaching_descr",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Description to be added"
+  },
+  {
+   "fieldname": "mentoring_details",
    "fieldtype": "Table",
-   "label": "Contributing to organising conferences/ ev",
+   "label": "Mentoring Details",
+   "options": "Mentoring Details Child"
+  },
+  {
+   "fieldname": "research_descr",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Description to be added"
+  },
+  {
+   "fieldname": "contribution_details",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Contribution Details",
+   "options": "Contribution Details Child"
+  },
+  {
+   "fieldname": "pdp_school",
+   "fieldtype": "Table",
+   "label": "Professional Development Programs (govt bodies, social sector, school teacher, etc.)",
+   "options": "Professional Development Programs"
+  },
+  {
+   "fieldname": "institution_building",
+   "fieldtype": "Section Break",
+   "label": "Institution Building"
+  },
+  {
+   "fieldname": "volunteering_for_organising_conferences",
+   "fieldtype": "Table",
+   "label": "Contributing to organising conferences/ events, community engagement, etc. ",
    "options": "Volunteering for organising conferences"
   },
   {
-   "fieldname": "reflection_sectiontext",
+   "fieldname": "reflection_section",
    "fieldtype": "Section Break",
-   "label": "<h3>Reflection</h3><h3></h3>"
-  },
-  {
-   "fieldname": "test",
-   "fieldtype": "Long Text",
-   "label": "Research-Writing-Reflection "
+   "label": "Reflection"
   },
   {
    "fieldname": "test1",
    "fieldtype": "Long Text",
-   "label": "Teaching-Mentoring-Reflection "
+   "label": "Teaching-Mentoring-Reflection"
+  },
+  {
+   "fieldname": "test",
+   "fieldtype": "Long Text",
+   "label": "Research-Writing-Reflection"
   },
   {
    "fieldname": "test2",
@@ -436,36 +464,61 @@
   {
    "fieldname": "test3",
    "fieldtype": "Long Text",
-   "label": "Institution Building-Reflection "
+   "label": "Institution Building-Reflection"
   },
   {
    "fieldname": "test4",
    "fieldtype": "Long Text",
-   "label": "Other Reflectioan "
+   "label": "Other Reflectioan"
   },
   {
-   "default": "Save",
-   "fieldname": "engagement_tracker_status",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "label": "Engagement Tracker status",
-   "options": "Save\nSubmit\nEnable to Edit",
-   "read_only_depends_on": "1"
+   "fieldname": "h3objectivesh3_section",
+   "fieldtype": "Section Break",
+   "label": "<h3>Objectives</h3>"
+  },
+  {
+   "fieldname": "objectives",
+   "fieldtype": "Table",
+   "label": "Objectives",
+   "options": "Objectives"
+  },
+  {
+   "fieldname": "feedback_if_any",
+   "fieldtype": "Long Text",
+   "label": "Feedback (if any)"
   }
  ],
  "grid_page_length": 50,
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-24 12:41:51.693202",
+ "modified": "2025-12-16 14:46:52.869424",
  "modified_by": "Administrator",
  "module": "FPMSS Master",
- "name": "Engagement Tracker",
- "naming_rule": "Autoincrement",
+ "name": "Engagement",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
- "permissions": [],
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
  "row_format": "Dynamic",
- "sort_field": "creation",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "employee_name"
+ "title_field": "employee_name",
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }

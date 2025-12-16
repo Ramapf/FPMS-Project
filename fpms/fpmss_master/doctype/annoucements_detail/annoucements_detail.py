@@ -1,109 +1,111 @@
-# apps/fpms/fpms/fpmss_masster/doctype/annoucement/annoucement.py
-
 import frappe
 from frappe.model.document import Document
 
+
 # =====================================================================
-#  ANNOUNCEMENT DOCTYPE – AFTER INSERT TRIGGER
+#  ANNOUNCEMENT DOCTYPE – AFTER INSERT
 # =====================================================================
 
-class Annoucement(Document):
+class AnnoucementsDetail(Document):
+
     def after_insert(self):
-        """Send announcement email after inserting the Annoucement document."""
-        send_announcement_email(self)
+        send_announcement_email(self.name)
 
 
 # =====================================================================
-#  SEND EMAIL TO FACULTY & SUPERVISORS
+#  SEND ANNOUNCEMENT EMAIL
 # =====================================================================
 
-def send_announcement_email(doc):
-    recipients = []
+@frappe.whitelist()
+def send_announcement_email(docname):
 
-    # ------------------------------------------------------
-    # 1️⃣ Collect Faculty Emails
-    # ------------------------------------------------------
-    for row in doc.faculty_name:
-        email = frappe.db.get_value("Faculty", row.faculty, "email")
-        if email:
-            recipients.append(email)
+    doc = frappe.get_doc("Annoucements Detail", docname)
 
-    # ------------------------------------------------------
-    # 2️⃣ Collect Supervisor Emails
-    # ------------------------------------------------------
-    for row in doc.supervisor_name:
-        email = frappe.db.get_value("Supervisor", row.supervisor, "email")
-        if email:
-            recipients.append(email)
+    recipients = set()
 
-    # Remove duplicates
-    recipients = list(set(recipients))
+    # -------------------------------------------------------------
+    # Collect Faculty Emails
+    # -------------------------------------------------------------
+    if doc.faculty_name:
+        for row in doc.faculty_name:
+            email = frappe.db.get_value("Faculty", row.faculty, "email")
+            if email:
+                recipients.add(email)
+
+    # -------------------------------------------------------------
+    # Collect Supervisor Emails
+    # -------------------------------------------------------------
+    if doc.supervisor_name:
+        for row in doc.supervisor_name:
+            email = frappe.db.get_value("Supervisor", row.supervisor, "email")
+            if email:
+                recipients.add(email)
 
     if not recipients:
-        frappe.msgprint("⚠️ No email IDs found. No announcement sent.")
         return
 
-    # ------------------------------------------------------
-    # 3️⃣ Prepare Email Details
-    # ------------------------------------------------------
-    subject = "Creation of FPMS Form"
-    year = doc.academic_year or "2025-2026"
-
-    # Auto detects site URL (local + cloud)
-    base_url = frappe.utils.get_url()
-
-    # Engagement Tracker auto-fill link
-    tracker_url = (
-        f"{base_url}/app/engagement-tracker/new-engagement-tracker?"
-        f"academic_year={doc.academic_year}&announcement={doc.announcement_id}"
+    # -------------------------------------------------------------
+    # Engagement Link
+    # -------------------------------------------------------------
+    engagement_link = (
+        f"{frappe.utils.get_url()}/app/engagement/new-engagement"
+        f"?announcement={doc.name}"
+        f"&academic_year={doc.academic_year}"
     )
 
-    # ------------------------------------------------------
-    # 4️⃣ Send Email to Each Recipient
-    # ------------------------------------------------------
+    subject = "Creation of FPMS Form"
+    year = doc.academic_year or "2025–2026"
+
+    # -------------------------------------------------------------
+    # Send Email
+    # -------------------------------------------------------------
     for email in recipients:
 
-        faculty_info = frappe.db.get_value(
+        faculty = frappe.db.get_value(
             "Faculty",
             {"email": email},
             ["faculty_name", "emp_code"],
             as_dict=True
         ) or {}
 
-        faculty_name = faculty_info.get("faculty_name") or "Faculty Member"
-        emp_code = faculty_info.get("emp_code") or "-"
+        full_name = faculty.get("faculty_name") or "Faculty"
+        first_name = full_name.split(" ")[0]
+        employee_code = faculty.get("emp_code") or "-"
 
+        # ---------------------------------------------------------
+        # EMAIL BODY (YOUR EXACT TEMPLATE)
+        # ---------------------------------------------------------
         message = f"""
-        <p>Dear {faculty_name},</p>
+<p>Dear {first_name},</p>
 
-        <p>
-            The FPMS form <b>{doc.announcement_id}</b> (Faculty ID: <b>{emp_code}</b>) 
-            for the year <b>{year}</b> has been created.
-        </p>
+<p>
+The FPMS form <b>{full_name}</b> <b>{employee_code}</b>
+for the year <b>{year}</b> has been created in the Frappe FPMS system.
+</p>
 
-        <p>Please click the button below to open the Engagement Tracker:</p>
+<p>
+Please use the link below to navigate to the document and to start
+setting your Objectives and engagement details.
+</p>
 
-        <p>
-            <a href="{tracker_url}" 
-            style="
-                background-color:#1a73e8;
-                color:white;
-                padding:10px 16px;
-                text-decoration:none;
-                border-radius:6px;
-                font-weight:bold;
-                display:inline-block;">
-                Open Engagement Tracker
-            </a>
-        </p>
+<p>
+<a href="{engagement_link}" target="_blank">{engagement_link}</a>
+</p>
 
-        <p>For support, contact: <b>fpmssupport@apu.edu.in</b></p>
+<p style="font-size: 12px; color: #555;">
+(Please do not respond to this automatic notification)
+</p>
 
-        <p><i>This is an automated email. Do not reply.</i></p>
+<p>
+In case of any query please write to
+<b>fpmssupport@apu.edu.in</b>
+</p>
 
-        <p>Regards,<br>
-        <b>People Function</b></p>
-        """
+<p>
+Regards,<br>
+<b>People Function</b>
+</p>
+"""
 
         frappe.sendmail(
             recipients=[email],
@@ -111,19 +113,15 @@ def send_announcement_email(doc):
             message=message
         )
 
-    frappe.msgprint("✅ FPMS Announcement Email sent successfully!")
+    frappe.msgprint("📧 FPMS Email Sent Successfully")
 
 
 # =====================================================================
-#  AUTO-FILL API (Used by Engagement Tracker to fill fields automatically)
+#  OPTIONAL: AUTO-FILL API
 # =====================================================================
 
 @frappe.whitelist()
-def apply_tracker_defaults(announcement=None, academic_year=None):
-    """
-    Returns default values for Engagement Tracker fields.
-    Triggered when user opens the form using URL parameters.
-    """
+def tracker_defaults(announcement=None, academic_year=None):
     return {
         "announcement": announcement,
         "academic_year": academic_year
